@@ -37,16 +37,16 @@ void fragment(){
 	float t20 = t/20.0;
 	vec3 nrm = mix(mix(texture(ripple,UV*tilling+t20).rgb,texture(ripple,rotate(UV,1.0)*tilling-t20).rgb,0.5),texture(ripple,0.01*UV*tilling).rgb,0.5);
 	
-	float superficie = (FRAGCOORD.z/FRAGCOORD.w);
+	float superficie = linearizeDepth(FRAGCOORD.z);
 	
 	vec2 uv = (2.0*nrm-1.0).rg*rippleFactor*0.05;
 	
-	float profundidad = linearizeDepth(texture(DEPTH_TEXTURE,SCREEN_UV).r)-superficie-0.09;
+	float profundidad = linearizeDepth(texture(DEPTH_TEXTURE,SCREEN_UV).r)-superficie;
 	
 	uv*=clamp(profundidad,0.0,1.0);
 	//uv=vec2(0.0,0.0);
 	
-	float profundidad_distort = (linearizeDepth(texture(DEPTH_TEXTURE,SCREEN_UV+uv).r)-superficie)-0.09;
+	float profundidad_distort = (linearizeDepth(texture(DEPTH_TEXTURE,SCREEN_UV+uv).r)-superficie);
 
 	float azul;
 	float verde;
@@ -78,9 +78,8 @@ void fragment(){
 	
 	NORMALMAP = mix(vec3(0.5,0.5,0.5),normalize(nrm),clamp(rippleFactor*0.1,0.0,1.0));
 
-	if(profundidad<=0.2 && profundidad>=0.0)
-		ALPHA = clamp(mix(profundidad,profundidad_distort,clamp(profundidad*5.0,0.0,1.0))*5.0,0.0,1.0);
-
+	if(profundidad<=0.1 && profundidad>=0.0)
+		ALPHA = clamp(mix(profundidad,profundidad_distort,clamp(profundidad*10.0,0.0,1.0))*10.0,0.0,1.0);
 }
 
 void vertex(){
